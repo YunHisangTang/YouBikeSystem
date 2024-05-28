@@ -1,6 +1,8 @@
 # 整體架構
-後端: SPRING BOOT 3
-前端: JAVAFX 的 Webview
+- 後端: SPRING BOOT 3
+- 前端: JAVAFX 的 Webview
+
+
 # 功能
 1. login、logout、register 實作完成 => 使用JWT做localstorage token 進行User資料的拿取
   
