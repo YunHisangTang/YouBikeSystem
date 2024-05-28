@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rental Records Search</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script>
+        function searchRentalRecords() {
+            // Implement search rental records functionality
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Rental Records Search</h1>
+    </header>
+    <main>
+        <div class="container">
+            <h2>Search Criteria</h2>
+            <form onsubmit="searchRentalRecords(); return false;">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" name="startDate"><br><br>
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" name="endDate"><br><br>
+                <button type="submit">Search</button>
+            </form>
+            <div id="rentalRecords">
+                <!-- Display rental records here -->
+            </div>
+            <button onclick="navigateHome()">Back to Home</button>
+        </div>
+    </main>
+    <script>
+        function navigateHome() {
+            window.location.href = 'home.html';
+        }
+    </script>
+</body>
+</html>

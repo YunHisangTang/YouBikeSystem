@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Repair Report</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script>
+        function reportRepair() {
+            // Implement report repair functionality
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Repair Report</h1>
+    </header>
+    <main>
+        <div class="container">
+            <h2>Report Repair</h2>
+            <form onsubmit="reportRepair(); return false;">
+                <label for="bikeNumber">Bike Number:</label>
+                <input type="text" id="bikeNumber" name="bikeNumber"><br><br>
+                <label for="reportDetails">Repair Details:</label>
+                <textarea id="reportDetails" name="reportDetails"></textarea><br><br>
+                <button type="submit">Report</button>
+            </form>
+            <button onclick="navigateHome()">Back to Home</button>
+        </div>
+    </main>
+    <script>
+        function navigateHome() {
+            window.location.href = 'home.html';
+        }
+    </script>
+</body>
+</html>

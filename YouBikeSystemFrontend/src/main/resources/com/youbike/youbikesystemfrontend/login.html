@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <script>
+        function login() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const password = document.getElementById('password').value;
+
+            fetch('http://localhost:9487/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ phoneNumber, password })
+            })
+            .then(response => response.json().then(data => ({ status: response.status, body: data })))
+            .then(result => {
+                if (result.status === 200) {
+                    localStorage.setItem('token', result.body.token);
+                    alert(result.body.message);
+                    window.location.href = 'home.html'; // Redirect to home.html
+                } else {
+                    throw new Error(result.body.message);
+                }
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+        }
+
+        function showRegister() {
+            window.location.href = 'register.html';
+        }
+    </script>
+</head>
+<body>
+    <h2>Login</h2>
+    <form id="loginForm">
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="text" id="phoneNumber" name="phoneNumber"><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br><br>
+        <input type="button" value="Login" onclick="login()">
+    </form>
+    <br>
+    <button onclick="showRegister()">Register</button>
+</body>
+</html>

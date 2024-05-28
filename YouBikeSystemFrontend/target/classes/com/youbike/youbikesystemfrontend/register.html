@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <script>
+        function register() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const password = document.getElementById('password').value;
+            const idCardNumber = document.getElementById('idCardNumber').value;
+            const email = document.getElementById('email').value;
+            const easyCardNumber = document.getElementById('easyCardNumber').value;
+
+            fetch('http://localhost:9487/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ phoneNumber, password, idCardNumber, email, easyCardNumber })
+            })
+            .then(response => response.json().then(data => ({ status: response.status, body: data })))
+            .then(result => {
+                alert(result.body.message);
+                if (result.status === 200) {
+                    window.location.href = 'login.html';
+                }
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+        }
+
+        function showLogin() {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <h2>Register</h2>
+    <form id="registerForm">
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="text" id="phoneNumber" name="phoneNumber"><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br><br>
+        <label for="idCardNumber">ID Card Number:</label>
+        <input type="text" id="idCardNumber" name="idCardNumber"><br><br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email"><br><br>
+        <label for="easyCardNumber">Easy Card Number:</label>
+        <input type="text" id="easyCardNumber" name="easyCardNumber"><br><br>
+        <input type="button" value="Register" onclick="register()">
+    </form>
+    <br>
+    <button onclick="showLogin()">Back to Login</button>
+</body>
+</html>

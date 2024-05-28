@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" type="text/css" href="home.css">
+    <script>
+        function getUser() {
+            const token = localStorage.getItem('token');
+            fetch('http://localhost:9487/api/auth/user', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Failed to fetch user');
+                }
+            })
+            .then(data => {
+                document.getElementById('userPhoneNumber').innerText = data.phoneNumber;
+                localStorage.setItem('userDetails', JSON.stringify(data));
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                window.location.href = 'login.html';
+            });
+        }
+
+        function getUserDetails() {
+            const token = localStorage.getItem('token');
+            fetch('http://localhost:9487/api/auth/user/details', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Failed to fetch user details');
+                }
+            })
+            .then(data => {
+                alert(JSON.stringify(data, null, 2)); // Display user details
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        document.addEventListener('DOMContentLoaded', getUser);
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Welcome to YouBike System</h1>
+    </header>
+    <main>
+        <div class="container">
+            <h2>Welcome, <span id="userName"></span></h2>
+            <p>Phone Number: <span id="userPhoneNumber"></span></p>
+            <div class="buttons top-buttons">
+                <button onclick="getUserDetails()">Personal Information</button>
+                <button onclick="logout()">Logout</button>
+            </div>
+            <hr>
+            <div class="buttons bottom-buttons">
+                <div class="button-row">
+                    <button onclick="navigateTo('station_search.html')">Station Search</button>
+                    <button onclick="navigateTo('rental_records.html')">Rental Records Search</button>
+                    <button onclick="navigateTo('easycard_recharge.html')">EasyCard Recharge</button>
+                </div>
+                <div class="button-row">
+                    <button onclick="navigateTo('rent_bike.html')">Rent Bike</button>
+                    <button onclick="navigateTo('return_bike.html')">Return Bike</button>
+                    <button onclick="navigateTo('repair_report.html')">Repair Report</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

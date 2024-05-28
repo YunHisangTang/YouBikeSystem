@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Return Bike</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script>
+        function returnBike() {
+            // Implement return bike functionality
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Return Bike</h1>
+    </header>
+    <main>
+        <div class="container">
+            <h2>Select Return Station</h2>
+            <form onsubmit="returnBike(); return false;">
+                <label for="station">Station:</label>
+                <input type="text" id="station" name="station"><br><br>
+                <button type="submit">Return Bike</button>
+            </form>
+            <button onclick="navigateHome()">Back to Home</button>
+        </div>
+    </main>
+    <script>
+        function navigateHome() {
+            window.location.href = 'home.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Station Search</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script>
+        function searchStation() {
+            // Implement search station functionality
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Station Search</h1>
+    </header>
+    <main>
+        <div class="container">
+            <h2>Search Criteria</h2>
+            <form onsubmit="searchStation(); return false;">
+                <label for="stationName">Name:</label>
+                <input type="text" id="stationName" name="stationName"><br><br>
+                <label for="stationLocation">Location:</label>
+                <input type="text" id="stationLocation" name="stationLocation"><br><br>
+                <label for="stationRange">Range:</label>
+                <input type="text" id="stationRange" name="stationRange"><br><br>
+                <label for="hasBike">Has Bike:</label>
+                <input type="checkbox" id="hasBike" name="hasBike"><br><br>
+                <label for="hasSpace">Has Space:</label>
+                <input type="checkbox" id="hasSpace" name="hasSpace"><br><br>
+                <button type="submit">Search</button>
+            </form>
+            <div id="searchResults">
+                <!-- Display search results here -->
+            </div>
+            <button onclick="navigateHome()">Back to Home</button>
+        </div>
+    </main>
+    <script>
+        function navigateHome() {
+            window.location.href = 'home.html';
+        }
+    </script>
+</body>
+</html>
