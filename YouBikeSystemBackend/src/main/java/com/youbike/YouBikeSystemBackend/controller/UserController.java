@@ -5,6 +5,7 @@ import com.youbike.YouBikeSystemBackend.service.UserService;
 import com.youbike.YouBikeSystemBackend.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin
+@CrossOrigin(origins = "*")
 public class UserController {
 
     @Autowired
@@ -36,7 +37,7 @@ public class UserController {
     @GetMapping("/user")
     public ResponseEntity<UserDTO> getUser(HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        Claims claims = jwtUtil.extractClaims(token);
+        Claims claims = jwtUtil.extractAllClaimsPublic(token);
         String phoneNumber = claims.getSubject();
 
         UserDTO userDTO = userService.getUserByPhoneNumber(phoneNumber);
@@ -46,7 +47,7 @@ public class UserController {
     @GetMapping("/user/details")
     public ResponseEntity<UserDTO> getUserDetails(HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        Claims claims = jwtUtil.extractClaims(token);
+        Claims claims = jwtUtil.extractAllClaimsPublic(token);
         String phoneNumber = claims.getSubject();
 
         UserDTO userDTO = userService.getUserDetailsByPhoneNumber(phoneNumber);

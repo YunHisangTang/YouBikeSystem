@@ -1,38 +1,161 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rent Bike</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="rent_bike.css">
     <script>
-        function rentBike() {
-            // Implement rent bike functionality
+        document.addEventListener("DOMContentLoaded", function() {
+            loadStations();
+            loadUserDetails();
+        });
+
+        async function loadStations() {
+            try {
+                const response = await fetch('http://localhost:9487/api/stations/all');
+                const stations = await response.json();
+                const stationSelect = document.getElementById('station');
+
+                stations.forEach(station => {
+                    const option = document.createElement('option');
+                    option.value = station.stationUID;
+                    option.text = station.nameZhTw;
+                    stationSelect.add(option);
+                });
+            } catch (error) {
+                console.error('Error loading stations:', error);
+            }
         }
-    </script>
-</head>
-<body>
-    <header>
-        <h1>Rent Bike</h1>
-    </header>
-    <main>
-        <div class="container">
-            <h2>Select Station and Bike</h2>
-            <form onsubmit="rentBike(); return false;">
-                <label for="station">Station:</label>
-                <input type="text" id="station" name="station"><br><br>
-                <label for="bikeType">Bike Type:</label>
-                <select id="bikeType" name="bikeType">
-                    <option value="standard">Standard</option>
-                    <option value="electric">Electric</option>
-                </select><br><br>
-                <button type="submit">Rent Bike</button>
-            </form>
-            <button onclick="navigateHome()">Back to Home</button>
-        </div>
-    </main>
-    <script>
+
+        async function loadUserDetails() {
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:9487/api/auth/user', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const userDetails = await response.json();
+
+            // 获取 EasyCard 余额
+            const balanceResponse = await fetch(`http://localhost:9487/api/easycard/balance?cardNumber=${userDetails.easyCardNumber}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const balance = await balanceResponse.json();
+            document.getElementById('easyCardBalance').innerText = balance;
+
+            const rentalResponse = await fetch(`http://localhost:9487/api/rentalRecords/current?easyCardNumber=${userDetails.easyCardNumber}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const rentalRecord = await rentalResponse.json();
+            
+            if (rentalRecord && !rentalRecord.returnTime) {
+                alert('You are currently renting a bike. Please return the bike before renting another one.');
+                window.location.href = 'home.html';
+            }
+        }
+
+        async function updateStationInfo() {
+            const stationUID = document.getElementById('station').value;
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:9487/api/stations/${stationUID}/info`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.status === 403) {
+                alert('You are not authorized to access this resource.');
+                return;
+            }
+
+            const stationInfo = await response.json();
+            document.getElementById('availableBikes').innerText = stationInfo.availableBikes !== undefined ? stationInfo.availableBikes : 'No data';
+            document.getElementById('availableSpaces').innerText = stationInfo.availableSpaces !== undefined ? stationInfo.availableSpaces : 'No data';
+
+            if (stationInfo.availableBikes === 0) {
+                alert('No available bikes at this station.');
+            }
+        }
+
+        async function rentBike() {
+            const stationUID = document.getElementById('station').value;
+            const bikeType = document.getElementById('bikeType').value;
+
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:9487/api/docks/findAvailableBike?stationUID=${stationUID}&bikeType=${bikeType}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.status === 200) {
+                const bike = await response.json();
+                const rentResponse = await fetch('http://localhost:9487/api/bikes/rent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        bikeUID: bike.bikeUID,
+                        stationUID: stationUID,
+                        startTime: new Date().toISOString(),
+                        userPhoneNumber: JSON.parse(localStorage.getItem('userDetails')).phoneNumber
+                    })
+                });
+
+                if (rentResponse.status === 200) {
+                    // 更新站点信息
+                    await updateStationInfo();
+                    alert('Bike rented successfully');
+                    // 6秒后跳转到home页面
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 6000);
+                } else {
+                    const error = await rentResponse.json();
+                    alert(`Error: ${error.error}`);
+                }
+            } else {
+                alert('No available bikes of the selected type at this station.');
+            }
+        }
+
         function navigateHome() {
             window.location.href = 'home.html';
         }
     </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="home-button" onclick="navigateHome()">HOME</button>
+        </div>
+        <div class="card">
+            <h2>Rent Bike</h2>
+            <form onsubmit="rentBike(); return false;">
+                <div class="form-group">
+                    <label for="station">Station:</label>
+                    <select id="station" name="station" onchange="updateStationInfo()"></select>
+                </div>
+                <div class="form-group">
+                    <label for="bikeType">Bike Type:</label>
+                    <select id="bikeType" name="bikeType">
+                        <option value="normal">Normal</option>
+                        <option value="electric">Electric</option>
+                    </select>
+                </div>
+                <p>Available Bikes: <span id="availableBikes"></span></p>
+                <p>Available Spaces: <span id="availableSpaces"></span></p>
+                <p>EasyCard Balance: <span id="easyCardBalance"></span></p>
+                <button type="submit" class="rent-button">Rent Bike</button>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

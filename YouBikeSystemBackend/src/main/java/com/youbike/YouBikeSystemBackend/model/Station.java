@@ -12,14 +12,33 @@ public class Station {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "stationuid")
     private String stationUID;
+
+    @Column(name = "stationid")
     private String stationID;
+
+    @Column(name = "authorityid")
     private String authorityID;
+
+    @Column(name = "name_zh_tw")
     private String nameZhTw;
+
+    @Column(name = "name_en")
     private String nameEn;
-    private double positionLon;
-    private double positionLat;
+
+    @Column(name = "position_lon")
+    private Double positionLon;
+
+    @Column(name = "position_lat")
+    private Double positionLat;
+
+    @Column(name = "address_zh_tw")
     private String addressZhTw;
+
+    @Column(name = "address_en")
     private String addressEn;
-    private int bikesCapacity;
+
+    @Column(name = "bikes_capacity")
+    private Integer bikesCapacity;
 }

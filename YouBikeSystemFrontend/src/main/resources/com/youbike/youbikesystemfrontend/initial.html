@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Initial</title>
+    <link rel="stylesheet" href="initial.css">
 </head>
 <body>
-<h2>Select Role</h2>
-<button onclick="showUserLogin()">User</button>
-<button onclick="showMaintenanceLogin()">Maintenance</button>
+    <div class="container">
+        <h2>Select Role</h2>
+        <button class="role-button" onclick="showUserLogin()">User</button>
+        <button class="role-button" onclick="showMaintenanceLogin()">Maintenance</button>
+    </div>
 
-<script>
-    function showUserLogin() {
-        window.location.href = 'login.html';
-    }
+    <script>
+        function showUserLogin() {
+            window.location.href = 'login.html';
+        }
 
-    function showMaintenanceLogin() {
-        // Implement maintenance login if needed
-        alert('Maintenance login not implemented yet.');
-    }
-</script>
+        function showMaintenanceLogin() {
+            window.location.href = 'maintenance_login.html';
+        }
+    </script>
 </body>
 </html>

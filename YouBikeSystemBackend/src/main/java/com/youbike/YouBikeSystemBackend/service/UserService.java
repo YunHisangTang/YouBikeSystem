@@ -1,29 +1,35 @@
 package com.youbike.YouBikeSystemBackend.service;
 
 import com.youbike.YouBikeSystemBackend.dto.UserDTO;
+import com.youbike.YouBikeSystemBackend.model.EasyCard;
 import com.youbike.YouBikeSystemBackend.model.User;
+import com.youbike.YouBikeSystemBackend.repository.EasyCardRepository;
 import com.youbike.YouBikeSystemBackend.repository.UserRepository;
 import com.youbike.YouBikeSystemBackend.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-
-
-
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
+    private EasyCardRepository easyCardRepository;
+    @Autowired
+    @Lazy
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -43,6 +49,11 @@ public class UserService {
         user.setEmail(userDTO.getEmail());
         user.setEasyCardNumber(userDTO.getEasyCardNumber());
         userRepository.save(user);
+
+        EasyCard easyCard = new EasyCard();
+        easyCard.setCardNumber(userDTO.getEasyCardNumber());
+        easyCard.setBalance(0.0);
+        easyCardRepository.save(easyCard);
 
         response.put("message", "User registered successfully");
         return ResponseEntity.ok(response);
@@ -64,10 +75,18 @@ public class UserService {
         return ResponseEntity.status(401).body(response);
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String phoneNumber) throws UsernameNotFoundException {
+        User user = userRepository.findByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with phone number: " + phoneNumber));
+        return new org.springframework.security.core.userdetails.User(user.getPhoneNumber(), user.getPassword(), new ArrayList<>());
+    }
+
     public UserDTO getUserByPhoneNumber(String phoneNumber) {
         User user = userRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         UserDTO userDTO = new UserDTO();
+        userDTO.setUserId(user.getId());
         userDTO.setPhoneNumber(user.getPhoneNumber());
         userDTO.setIdCardNumber(user.getIdCardNumber());
         userDTO.setEmail(user.getEmail());

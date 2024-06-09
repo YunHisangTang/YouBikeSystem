@@ -2,21 +2,21 @@
 <html>
 <head>
     <title>Initial</title>
+    <link rel="stylesheet" href="initial.css">
 </head>
 <body>
-<h2>Select Role</h2>
-<button onclick="showUserLogin()">User</button>
-<button onclick="showMaintenanceLogin()">Maintenance</button>
+    <h2>Select Role</h2>
+    <button class="role-button" onclick="showUserLogin()">User</button>
+    <button class="role-button" onclick="showMaintenanceLogin()">Maintenance</button>
 
-<script>
-    function showUserLogin() {
-        window.location.href = 'login.html';
-    }
+    <script>
+        function showUserLogin() {
+            window.location.href = 'login.html';
+        }
 
-    function showMaintenanceLogin() {
-        // Implement maintenance login if needed
-        alert('Maintenance login not implemented yet.');
-    }
-</script>
+        function showMaintenanceLogin() {
+            alert('Maintenance login not implemented yet.');
+        }
+    </script>
 </body>
 </html>

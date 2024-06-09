@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <link rel="stylesheet" href="login.css">
     <script>
         function login() {
             const phoneNumber = document.getElementById('phoneNumber').value;
@@ -19,7 +22,7 @@
                 if (result.status === 200) {
                     localStorage.setItem('token', result.body.token);
                     alert(result.body.message);
-                    window.location.href = 'home.html'; // Redirect to home.html
+                    window.location.href = 'home.html';
                 } else {
                     throw new Error(result.body.message);
                 }
@@ -32,18 +35,34 @@
         function showRegister() {
             window.location.href = 'register.html';
         }
+
+        function showInitial() {
+            window.location.href = 'initial.html';
+        }
     </script>
 </head>
 <body>
-    <h2>Login</h2>
-    <form id="loginForm">
-        <label for="phoneNumber">Phone Number:</label>
-        <input type="text" id="phoneNumber" name="phoneNumber"><br><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password"><br><br>
-        <input type="button" value="Login" onclick="login()">
-    </form>
-    <br>
-    <button onclick="showRegister()">Register</button>
+    <div class="container">
+        <div class="header">
+            <button class="back-button" onclick="showInitial()">BACK</button>
+        </div>
+        <div class="card">
+            <h1>Login</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number:</label>
+                    <input type="text" id="phoneNumber" name="phoneNumber" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="button-row">
+                    <button type="button" class="action-button" onclick="login()">Login</button>
+                    <button type="button" class="action-button" onclick="showRegister()">Register</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

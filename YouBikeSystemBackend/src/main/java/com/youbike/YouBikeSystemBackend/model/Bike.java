@@ -12,10 +12,14 @@ public class Bike {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "bikeuid")
     private String bikeUID;
+    @Column(name = "authorityid")
     private String authorityID;
+    @Column(name = "type")
     private String type;  // "Normal" 或 "Electric"
-    private String status;  // "非營運中", "營運中", "租用中", "遺失"
-    private String currentLocation;  // 站點+車柱
+    @Column(name = "status")
+    private String status;  // "非營運中"(Out of Service), "營運中"(Operational), "租用中"(Rented), "遺失"(Lost)
+    @Column(name = "maintenance_info")
     private String maintenanceInfo;
 }

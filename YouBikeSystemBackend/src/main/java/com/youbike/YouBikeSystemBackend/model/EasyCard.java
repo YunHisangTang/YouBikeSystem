@@ -9,7 +9,9 @@ import lombok.*;
 @AllArgsConstructor
 public class EasyCard {
     @Id
+    @Column(name = "card_number")
     private String cardNumber;
 
+    @Column(name="balance")
     private double balance;
 }

@@ -1,43 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Station Search</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    <script>
-        function searchStation() {
-            // Implement search station functionality
-        }
-    </script>
+    <link rel="stylesheet" href="station_search.css">
 </head>
 <body>
-    <header>
-        <h1>Station Search</h1>
-    </header>
-    <main>
-        <div class="container">
-            <h2>Search Criteria</h2>
-            <form onsubmit="searchStation(); return false;">
-                <label for="stationName">Name:</label>
-                <input type="text" id="stationName" name="stationName"><br><br>
-                <label for="stationLocation">Location:</label>
-                <input type="text" id="stationLocation" name="stationLocation"><br><br>
-                <label for="stationRange">Range:</label>
-                <input type="text" id="stationRange" name="stationRange"><br><br>
-                <label for="hasBike">Has Bike:</label>
-                <input type="checkbox" id="hasBike" name="hasBike"><br><br>
-                <label for="hasSpace">Has Space:</label>
-                <input type="checkbox" id="hasSpace" name="hasSpace"><br><br>
-                <button type="submit">Search</button>
-            </form>
-            <div id="searchResults">
-                <!-- Display search results here -->
-            </div>
-            <button onclick="navigateHome()">Back to Home</button>
-        </div>
-    </main>
+    <h1>Station Search</h1>
+    <button class="home-button" onclick="window.location.href='home.html'">HOME</button>
+    <form id="search-form" onsubmit="return searchStation(event)">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name">
+        <br>
+        <label for="lat">Latitude:</label>
+        <input type="text" id="lat" name="lat">
+        <br>
+        <label for="lon">Longitude:</label>
+        <input type="text" id="lon" name="lon">
+        <br>
+        <label for="range">Range (km):</label>
+        <input type="text" id="range" name="range">
+        <br>
+        <label for="hasBike">Has Bike:</label>
+        <input type="checkbox" id="hasBike" name="hasBike">
+        <br>
+        <label for="hasSpace">Has Space:</label>
+        <input type="checkbox" id="hasSpace" name="hasSpace">
+        <br>
+        <button type="submit">Search</button>
+    </form>
+    <div id="results"></div>
+    <div class="pagination">
+        <button id="prev-page" onclick="changePage(-1)" disabled>Previous</button>
+        <button id="next-page" onclick="changePage(1)" disabled>Next</button>
+    </div>
     <script>
-        function navigateHome() {
-            window.location.href = 'home.html';
+        let currentPage = 0;
+        let totalResults = 0;
+        const pageSize = 10;
+
+        async function searchStation(event) {
+            event.preventDefault();
+            currentPage = 0;
+            await fetchResults();
+        }
+
+        async function fetchResults() {
+            const form = document.getElementById('search-form');
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+            for (const [key, value] of formData.entries()) {
+                params.append(key, value);
+            }
+            params.append('page', currentPage);
+            params.append('size', pageSize);
+
+            const token = localStorage.getItem('token');
+
+            const response = await fetch(`http://localhost:9487/api/stations/search?${params.toString()}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                totalResults = data.length;
+                displayResults(data);
+                updatePaginationButtons();
+            } else if (response.status === 400) {
+                const errorData = await response.json();
+                displayError(errorData.message);
+            } else {
+                displayResults([]); // 确保在其他错误时返回空的 JSON
+            }
+        }
+
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            if (data.length === 0) {
+                resultsDiv.innerHTML = '<p>No stations found</p>';
+                return;
+            }
+
+            data.forEach(station => {
+                const stationDiv = document.createElement('div');
+                const bikeTypes = station.bikeTypes ? station.bikeTypes.join(', ') : 'N/A';
+                stationDiv.innerHTML = `
+                    <h3>${station.nameEn} (${station.nameZhTw})</h3>
+                    <p>Location: ${station.addressZhTw}</p>
+                    <p>Available Bikes: ${station.availableBikes !== undefined ? station.availableBikes : 'N/A'}</p>
+                    <p>Available Spaces: ${station.availableSpaces !== undefined ? station.availableSpaces : 'N/A'}</p>
+                    <p>Bike Types: ${bikeTypes}</p>
+                `;
+                resultsDiv.appendChild(stationDiv);
+            });
+        }
+
+        function displayError(message) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `<p>Error: ${message}</p>`;
+        }
+
+        function updatePaginationButtons() {
+            const prevButton = document.getElementById('prev-page');
+            const nextButton = document.getElementById('next-page');
+
+            prevButton.disabled = currentPage === 0;
+            nextButton.disabled = totalResults < pageSize;
+        }
+
+        function changePage(offset) {
+            currentPage += offset;
+            fetchResults();
         }
     </script>
 </body>

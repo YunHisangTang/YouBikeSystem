@@ -10630,5 +10630,29 @@
 		"DockID": "18",
 		"StationUID": "TPE500119091",
 		"Bike": ""
+	},
+	{
+		"DockUID": "TAO500301001_01",
+		"DockID": "1",
+		"StationUID": "TAO500301001",
+		"Bike": ""
+	},
+	{
+		"DockUID": "TAO500301001_02",
+		"DockID": "2",
+		"StationUID": "TAO500301001",
+		"Bike": ""
+	},
+	{
+		"DockUID": "TAO500301001_03",
+		"DockID": "3",
+		"StationUID": "TAO500301001",
+		"Bike": ""
+	},
+	{
+		"DockUID": "TAO500301001_04",
+		"DockID": "4",
+		"StationUID": "TAO500301001",
+		"Bike": ""
 	}
 ]

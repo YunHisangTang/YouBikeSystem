@@ -13,15 +13,14 @@ header {
 }
 
 main {
-    padding: 1rem;
-}
-
-h2 {
-    margin-top: 0;
+    display: flex;
+    flex-direction: row;
 }
 
 .container {
-    max-width: 600px;
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
     margin: 2rem auto;
     background: white;
     padding: 2rem;
@@ -29,29 +28,70 @@ h2 {
     border-radius: 8px;
 }
 
+.sidebar {
+    width: 25%;
+    padding: 1rem;
+    background: #f4f4f4;
+    border-right: 1px solid #ddd;
+    text-align: center;
+}
+
+.sidebar h2 {
+    margin-top: 0;
+}
+
+.sidebar p {
+    margin: 1rem 0;
+}
+
+.profile-picture {
+    margin: 1rem 0;
+}
+
+.profile-picture img {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+}
+
+.content {
+    width: 75%;
+    padding: 2rem;
+    text-align: center;
+}
+
 .buttons {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 1rem;
-    justify-content: center;
+    align-items: center;
 }
 
-.top-buttons button {
-    background-color: #4CAF50;
-}
-
-.bottom-buttons .button-row {
+.button-row {
     display: flex;
     gap: 1rem;
     justify-content: center;
     width: 100%;
 }
 
-.bottom-buttons button {
-    background-color: #2196F3;
+.sidebar-button {
+    width: 100%;
+    margin: 0.5rem 0;
+    background-color: #f44336;
+    padding: 1rem;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-button {
+.sidebar-button:hover {
+    background-color: #e53935;
+}
+
+.main-button {
+    width: 200px;
     padding: 1rem;
     font-size: 1rem;
     color: white;
@@ -61,24 +101,32 @@ button {
     transition: background-color 0.3s ease;
 }
 
-.top-buttons button:hover {
+.main-button.green {
+    background-color: #4CAF50;
+}
+
+.main-button.blue {
+    background-color: #2196F3;
+}
+
+.main-button.green:hover {
     background-color: #45a049;
 }
 
-.top-buttons button:active {
-    background-color: #388e3c;
-}
-
-.bottom-buttons button:hover {
+.main-button.blue:hover {
     background-color: #1976D2;
 }
 
-.bottom-buttons button:active {
-    background-color: #0D47A1;
+.main-button:active {
+    background-color: #388e3c;
 }
 
 hr {
     margin: 2rem 0;
     border: none;
     border-top: 1px solid #ccc;
+}
+
+#personal-info {
+    text-align: left;
 }

@@ -1,33 +1,163 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Return Bike</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="return_bike.css">
     <script>
-        function returnBike() {
-            // Implement return bike functionality
+        document.addEventListener("DOMContentLoaded", function() {
+            checkActiveRental();
+        });
+
+        async function checkActiveRental() {
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:9487/api/auth/user', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const userDetails = await response.json();
+
+            const rentalResponse = await fetch(`http://localhost:9487/api/rentalRecords/current?easyCardNumber=${userDetails.easyCardNumber}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (rentalResponse.status === 404) {
+                alert('You do not have an active rental record.');
+                window.location.href = 'home.html';
+                return;
+            }
+
+            const rentalRecord = await rentalResponse.json();
+            if (rentalRecord && !rentalRecord.returnTime) {
+                document.getElementById('rentedFrom').innerText = rentalRecord.rentStation;
+                document.getElementById('bikeUID').innerText = rentalRecord.bikeUID;
+                loadStations();
+                loadUserDetails();
+            }
         }
-    </script>
-</head>
-<body>
-    <header>
-        <h1>Return Bike</h1>
-    </header>
-    <main>
-        <div class="container">
-            <h2>Select Return Station</h2>
-            <form onsubmit="returnBike(); return false;">
-                <label for="station">Station:</label>
-                <input type="text" id="station" name="station"><br><br>
-                <button type="submit">Return Bike</button>
-            </form>
-            <button onclick="navigateHome()">Back to Home</button>
-        </div>
-    </main>
-    <script>
+
+        async function loadStations() {
+            try {
+                const response = await fetch('http://localhost:9487/api/stations/all');
+                const stations = await response.json();
+                const stationSelect = document.getElementById('station');
+
+                stations.forEach(station => {
+                    const option = document.createElement('option');
+                    option.value = station.stationUID;
+                    option.text = station.nameZhTw;
+                    stationSelect.add(option);
+                });
+            } catch (error) {
+                console.error('Error loading stations:', error);
+            }
+        }
+
+        async function loadUserDetails() {
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:9487/api/auth/user', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const userDetails = await response.json();
+
+            // 获取 EasyCard 余额
+            const balanceResponse = await fetch(`http://localhost:9487/api/easycard/balance?cardNumber=${userDetails.easyCardNumber}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const balance = await balanceResponse.json();
+            document.getElementById('easyCardBalance').innerText = balance;
+        }
+
+        async function updateStationInfo() {
+            const stationUID = document.getElementById('station').value;
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:9487/api/stations/${stationUID}/info`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.status === 403) {
+                alert('You are not authorized to access this resource.');
+                return;
+            }
+
+            const stationInfo = await response.json();
+            document.getElementById('availableBikes').innerText = stationInfo.availableBikes !== undefined ? stationInfo.availableBikes : 'No data';
+            document.getElementById('availableSpaces').innerText = stationInfo.availableSpaces !== undefined ? stationInfo.availableSpaces : 'No data';
+
+            if (stationInfo.availableSpaces === 0) {
+                alert('No available spaces at this station.');
+            }
+        }
+
+        async function returnBike() {
+            const stationUID = document.getElementById('station').value;
+            const endTime = new Date().toISOString();
+
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:9487/api/bikes/return', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    stationUID: stationUID,
+                    endTime: endTime,
+                    userPhoneNumber: JSON.parse(localStorage.getItem('userDetails')).phoneNumber
+                })
+            });
+
+            if (response.status === 200) {
+                // 更新站点信息
+                await updateStationInfo();
+                // 更新 EasyCard 余额
+                await loadUserDetails();
+                alert('Bike returned successfully');
+                // 6秒后跳转到home页面
+                setTimeout(() => {
+                    window.location.href = 'home.html';
+                }, 6000);
+            } else {
+                const error = await response.json();
+                alert(`Error: ${error.error}`);
+            }
+        }
+
         function navigateHome() {
             window.location.href = 'home.html';
         }
     </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="home-button" onclick="navigateHome()">HOME</button>
+        </div>
+        <div class="card">
+            <h2>Return Bike</h2>
+            <p>Rented From: <span id="rentedFrom"></span></p>
+            <p>Bike UID: <span id="bikeUID"></span></p>
+            <form onsubmit="returnBike(); return false;">
+                <div class="form-group">
+                    <label for="station">Station:</label>
+                    <select id="station" name="station" onchange="updateStationInfo()"></select>
+                </div>
+                <p>Available Bikes: <span id="availableBikes"></span></p>
+                <p>Available Spaces: <span id="availableSpaces"></span></p>
+                <p>EasyCard Balance: <span id="easyCardBalance"></span></p>
+                <button type="submit" class="return-button">Return Bike</button>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
