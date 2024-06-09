@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Youbike/Dock Status</title>
+    <link rel="stylesheet" type="text/css" href="youbike_dock_status.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            loadBikeOptions();
+            loadDockOptions();
+
+            document.getElementById('bikeUID').addEventListener('change', function () {
+                fetchBikeStatus(this.value);
+            });
+
+            document.getElementById('dockUID').addEventListener('change', function () {
+                fetchDockStatus(this.value);
+            });
+        });
+
+        function loadBikeOptions() {
+            fetch('http://localhost:9487/api/bikes/all')
+                .then(response => response.json())
+                .then(data => {
+                    const bikeSelect = document.getElementById('bikeUID');
+                    data.forEach(bike => {
+                        const option = document.createElement('option');
+                        option.value = bike.bikeUID;
+                        option.text = bike.bikeUID;
+                        bikeSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading bike options:', error));
+        }
+
+        function loadDockOptions() {
+            fetch('http://localhost:9487/api/docks/all')
+                .then(response => response.json())
+                .then(data => {
+                    const dockSelect = document.getElementById('dockUID');
+                    data.forEach(dock => {
+                        const option = document.createElement('option');
+                        option.value = dock.dockUID;
+                        option.text = dock.dockUID;
+                        dockSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading dock options:', error));
+        }
+
+        function fetchBikeStatus(bikeUID) {
+            fetch(`http://localhost:9487/api/bikes/${bikeUID}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('currentBikeStatus').textContent = data.status;
+                })
+                .catch(error => console.error('Error fetching bike status:', error));
+        }
+
+        function fetchDockStatus(dockUID) {
+            fetch(`http://localhost:9487/api/docks/${dockUID}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('currentDockStatus').textContent = data.status;
+                })
+                .catch(error => console.error('Error fetching dock status:', error));
+        }
+
+        function updateBikeStatus() {
+            const bikeUID = document.getElementById('bikeUID').value;
+            const status = document.getElementById('bikeStatus').value;
+
+            fetch(`http://localhost:9487/api/bikes/${bikeUID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Bike status updated successfully');
+                fetchBikeStatus(bikeUID);
+            })
+            .catch(error => console.error('Error updating bike status:', error));
+        }
+
+        function updateDockStatus() {
+            const dockUID = document.getElementById('dockUID').value;
+            const status = document.getElementById('dockStatus').value;
+
+            fetch(`http://localhost:9487/api/docks/${dockUID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Dock status updated successfully');
+                fetchDockStatus(dockUID);
+            })
+            .catch(error => console.error('Error updating dock status:', error));
+        }
+
+        function goBackHome() {
+            window.location.href = 'maintenance_home.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="outer-container">
+        <div class="card">
+            <div class="card-header">
+                <div class="header-content">
+                    <button class="back-button" onclick="goBackHome()">Home</button>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="status-card">
+                    <h2>Youbike Status</h2>
+                    <label for="bikeUID">Select Bike UID:</label>
+                    <select id="bikeUID">
+                        <option value="">Select Bike</option>
+                    </select>
+                    <p>Current Status: <span id="currentBikeStatus"></span></p>
+                    <label for="bikeStatus">Set Status:</label>
+                    <select id="bikeStatus">
+                        <option value="Operational">Operational</option>
+                        <option value="Out of Service">Out of Service</option>
+                        <option value="Rented">Rented</option>
+                        <option value="Lost">Lost</option>
+                    </select>
+                    <button onclick="updateBikeStatus()">Update Bike Status</button>
+                </div>
+                <div class="status-card">
+                    <h2>Dock Status</h2>
+                    <label for="dockUID">Select Dock UID:</label>
+                    <select id="dockUID">
+                        <option value="">Select Dock</option>
+                    </select>
+                    <p>Current Status: <span id="currentDockStatus"></span></p>
+                    <label for="dockStatus">Set Status:</label>
+                    <select id="dockStatus">
+                        <option value="Operational">Operational</option>
+                        <option value="Out of Service">Out of Service</option>
+                    </select>
+                    <button onclick="updateDockStatus()">Update Dock Status</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

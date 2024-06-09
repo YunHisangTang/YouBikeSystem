@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repair Report</title>
+    <link rel="stylesheet" type="text/css" href="repair_report.css">
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            loadAssets();
+            loadUserReports();
+        });
+
+        async function loadAssets() {
+            const token = localStorage.getItem('token');
+            const typeSelect = document.getElementById('type');
+
+            typeSelect.addEventListener('change', async function() {
+                const selectedType = typeSelect.value;
+                const assetSelect = document.getElementById('assetsUID');
+                assetSelect.innerHTML = '';
+
+                if (selectedType) {
+                    const response = await fetch(`http://localhost:9487/api/${selectedType}/all`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const assets = await response.json();
+
+                    assets.forEach(asset => {
+                        const option = document.createElement('option');
+                        if (selectedType === 'bikes') {
+                            option.value = asset.bikeUID;
+                            option.text = asset.bikeUID;
+                        } else if (selectedType === 'docks') {
+                            option.value = asset.dockUID;
+                            option.text = asset.dockUID;
+                        }
+                        assetSelect.add(option);
+                    });
+                }
+            });
+        }
+
+        async function loadUserReports() {
+            const token = localStorage.getItem('token');
+            const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+            const response = await fetch(`http://localhost:9487/api/maintenanceReports/user/${userDetails.userId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const reports = await response.json();
+            const reportTableBody = document.getElementById('reportTableBody');
+            reportTableBody.innerHTML = '';
+
+            reports.forEach((report, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${report.type}</td>
+                    <td>${report.assetsUID}</td>
+                    <td>${report.reportStatus}</td>
+                    <td>${report.reportDetail}</td>
+                `;
+                reportTableBody.appendChild(row);
+            });
+        }
+
+        async function submitReport() {
+            const type = document.getElementById('type').value;
+            const assetsUID = document.getElementById('assetsUID').value;
+            const reportDetail = document.getElementById('reportDetail').value;
+            const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+            const token = localStorage.getItem('token');
+
+            const response = await fetch('http://localhost:9487/api/maintenanceReports/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    type: type,
+                    assetsUID: assetsUID,
+                    reportDetail: reportDetail,
+                    reporterId: userDetails.userId
+                })
+            });
+
+            if (response.status === 200) {
+                alert('Report submitted successfully');
+                loadUserReports();
+            } else {
+                const error = await response.json();
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        function navigateHome() {
+            window.location.href = 'home.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="home-button" onclick="navigateHome()">HOME</button>
+        </div>
+        <div class="card">
+            <h2>Repair Report</h2>
+            <form onsubmit="submitReport(); return false;">
+                <div class="form-group">
+                    <label for="type">Type:</label>
+                    <select id="type" name="type">
+                        <option value="">Select Type</option>
+                        <option value="bikes">Bike</option>
+                        <option value="docks">Dock</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="assetsUID">Assets UID:</label>
+                    <select id="assetsUID" name="assetsUID"></select>
+                </div>
+                <div class="form-group">
+                    <label for="reportDetail">Report Detail:</label>
+                    <textarea id="reportDetail" name="reportDetail" rows="4"></textarea>
+                </div>
+                <button type="submit" class="report-button">Submit Report</button>
+            </form>
+        </div>
+        <hr>
+        <div class="reports-section">
+            <h3>Your Reports</h3>
+            <div class="table-container">
+                <table id="reportTable">
+                    <thead>
+                        <tr>
+                            <th>序號</th>
+                            <th>Type</th>
+                            <th>Assets UID</th>
+                            <th>Status</th>
+                            <th>Report Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
