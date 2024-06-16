@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Initial</title>
     <link rel="stylesheet" href="initial.css">
 </head>
 <body>
-    <h2>Select Role</h2>
-    <button class="role-button" onclick="showUserLogin()">User</button>
-    <button class="role-button" onclick="showMaintenanceLogin()">Maintenance</button>
+    <div class="container">
+        <h2>Select Role</h2>
+        <button class="role-button" onclick="showUserLogin()">User</button>
+        <button class="role-button" onclick="showMaintenanceLogin()">Maintenance</button>
+    </div>
 
     <script>
         function showUserLogin() {
@@ -15,7 +19,7 @@
         }
 
         function showMaintenanceLogin() {
-            alert('Maintenance login not implemented yet.');
+            window.location.href = 'maintenance_login.html';
         }
     </script>
 </body>
