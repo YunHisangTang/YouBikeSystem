@@ -10,8 +10,8 @@
 7. 維修通報
 
 # 資料夾目錄
-- YouBikeSystemBackend : 後端資料夾
-- YouBikeSystemFrontend :　前端資料夾
+- YouBikeSystemBackend : 後端資料夾 (使用標準的Spring MVC寫法: Controller、Service、Repository / Dto、Model)
+- YouBikeSystemFrontend :　前端資料夾 (View在這裡)
 - README.md
 - docker-compose.yaml :　docker設定mysql、apacheds
 - mysql.cnf : mysql設定檔
@@ -29,8 +29,17 @@
   - HTML 和 JavaScript：用於開發網頁操作介面。
   - CSS：用於網頁版面設計。
 
-- 維運 :
+- 維運:
   - Docker : 使用docker compose 進行MySQL資料庫、ApachDS(LDAP)的設定與管理。
   - MySQL：關聯式資料庫。
   - ApacheDS: 目錄伺服器。
 
+# 執行
+- Docker Desktop:
+  - 請用 docker-compose.yaml 和 mysql.cnf 啟動 mysql、apacheds(這要自己新增inetOrgPerson，一定要新增attribute:cn、usePassword)。
+  - docker compose up -d
+  
+- IntellJ:
+  - 分別開啟前端和後端專案:
+    - YouBikeSystemBackend : 找到 YouBikeSystemBackendApplication.java RUN 起來。
+    - YouBikeSystemFrontend : 找到 JavaFXApp.java RUN 起來。
